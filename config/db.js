@@ -1,5 +1,6 @@
 const { Sequelize } = require('sequelize');
-const sequelize = new Sequelize('CRUD_db', 'root', '', {
+const { DB_PASS } = require('./config');
+const sequelize = new Sequelize('CRUD_db', 'root', DB_PASS, {
   host: 'localhost',
   dialect: 'mysql',   
 });

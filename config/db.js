@@ -1,11 +1,12 @@
 const { Sequelize } = require('sequelize');
-const { DB_PASS } = require('./config');
+const { db_host,db_name,db_pass,db_user} = require('./config');
 
-const sequelize = new Sequelize('CRUD_db', 'root', DB_PASS, {
-  host: '127.0.0.1',
-  // host: 'localhost',
+
+
+const sequelize = new Sequelize(db_name, db_user, db_pass, {
+  host: db_host,
   dialect: 'mysql',
-  
+  logging: false,
 });
 
 sequelize.authenticate()

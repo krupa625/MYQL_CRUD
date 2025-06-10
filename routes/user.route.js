@@ -19,4 +19,6 @@ router.post('/:id/roles', userController.assignRolesToUser);
 // 1:1
 router.post('/:id/profile', userController.createProfile);
 
+router.get('/:id/includes', userController.getUserWithIncludes);
+router.get('/:id/filter', userController.getUserWithFilter);
 module.exports = router;

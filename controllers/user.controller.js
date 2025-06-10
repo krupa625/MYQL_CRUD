@@ -1,4 +1,5 @@
 const { User, Profile, Post, Role } = require('../models');
+const { Op } = require('sequelize');
 
 // Create user + profile (1:1)
 createUser = async (req, res) => {
@@ -73,14 +74,14 @@ assignRolesToUser = async (req, res) => {
     return res.status(400).json({ message: 'Some roleIds are invalid' });
   }
 
-  await user.setRoles(roleIds); // This will bulk insert into UserRoles
+  await user.setRoles(roleIds); 
   const assignedRoles = await user.getRoles();
   res.json({ message: 'Roles assigned successfully', roles: assignedRoles });
 };
 
 createRole = async (req, res) => {
   try {
-    const role = await Role.create(req.body); // expects { name: 'Admin' }
+    const role = await Role.create(req.body); 
     res.status(201).json(role);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -95,6 +96,39 @@ createProfile = async (req, res) => {
   res.status(201).json({ message: "Profile created", profile });
 };
 
+//use includes to fetch data and associations
+
+const getUserWithIncludes = async (req, res) => {
+  const user = await User.findByPk(req.params.id, {
+    include: [
+      { model: Profile, required: false },
+      { model: Post, required: false },
+      { model: Role, required: false }
+    ]
+  });
+console.log(user);
+
+  user ? res.json(user) : res.status(404).json({ message: 'User not found' });
+};
+
+const getUserWithFilter = async (req, res) => {
+  const { name, email } = req.query;
+
+  const where = {};
+  if (name) where.name = { [Op.like]: `%${name}%` };
+  if (email) where.email = { [Op.like]: `%${email}%` };
+
+  const user = await User.findOne({
+    where: { id: req.params.id, ...where },
+    include: [Profile, Post, Role]
+  });
+
+  user ? res.json(user) : res.status(404).json({ message: 'User not found' });
+};
+
+
+
+
 module.exports = {
   createUser,
   getUsers,
@@ -104,5 +138,7 @@ module.exports = {
   createPostForUser,
   assignRolesToUser,
   createProfile,
-  createRole
+  createRole,
+  getUserWithIncludes,
+  getUserWithFilter
 };
